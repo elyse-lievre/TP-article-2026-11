@@ -8,3 +8,4 @@
 *.tex
 *.pdf
 *_files/
+*index_cache/
