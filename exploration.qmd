@@ -117,7 +117,7 @@ paracou6 %>%
   # Nom des sites
   mutate(site = c("Paracou", "BCI")) %>% 
   # Profil de diversité avec enveloppe de confiance
-  profile_hill(n_simulations = 10) %>% 
+  profile_hill(n_simulations = 100) %>% 
   # Figure
   autoplot() +
   # Titre de la légende
