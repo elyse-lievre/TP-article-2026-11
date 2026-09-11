@@ -1,0 +1,139 @@
+---
+title: "Exploration"
+format: html
+editor: visual
+bibliography: references.bib
+---
+
+## Objectif
+
+Comparer la diversité de Paracou [@Gourlet-Fleury2004] et de BCI [@Raby2017].
+
+Les analyses sont réalisées avec R [@R] et le package divent [@Marcon2026a].
+
+## Données
+
+### Paracou
+
+Les données d'inventaire de Paracou sont dans le dossier `data`.
+
+```{r}
+library("tidyverse")
+paracou6 <- read_csv2("data/Paracou6.csv")
+```
+
+Vérification des données : carte des wapas.
+
+```{r}
+paracou6 %>%
+  # Filter the wapa trees
+  filter(Genus == "Eperua") %>%
+  # Make a plot
+  ggplot() + 
+  # Points represent the trees
+  geom_point(
+    aes(x = Xfield, y = Yfield, size = CircCorr, color = Species)
+  ) + 
+  # Fixed coordinates for a map
+  coord_fixed() + 
+  # Color selection
+  scale_color_brewer(palette = "Set1") +
+  # Polish the text
+  labs(
+    x = "X", 
+    y = "Y", 
+    caption = "Paracou, plot 6", 
+    size = "Circumference", 
+    color = "Species"
+  )
+```
+
+## BCI
+
+Les données sont dans le package *vegan* [@Oksanen2012].
+
+```{r}
+library("vegan")
+data(BCI)
+
+```
+
+Vérification des données : courbe Rang-abondance [@Whittaker1965].
+
+```{r}
+library("divent")
+BCI %>% 
+  # Création d'un objet "abundances"
+  as_abundances() %>% 
+  # Les poids des parcelles sont égaux
+  mutate(weight = 1) %>% 
+  # Regrouper toutes les parcelles
+  metacommunity() ->
+  BCI_50ha
+# RAC
+autoplot(BCI_50ha)
+```
+
+## Profil de diversité
+
+Valeur de la diversité en fonction de son ordre [@Tothmeresz1995; @Patil1982].
+
+### Paracou
+
+```{r}
+paracou6 %>% 
+  # Vecteur des noms d'espèce de chaque arbre
+  pull(spName) %>% 
+  # Création d'un objet "abundances"
+  as_abundances() %>% 
+  # Profil de diversité
+  profile_hill() %>% 
+  # Figure
+  autoplot()
+```
+
+### BCI
+
+```{r}
+BCI_50ha %>% 
+  profile_hill() %>% 
+  autoplot()
+```
+
+### Graphique unique
+
+Création d'un tableau d'abondances avec une ligne par site.
+
+```{r}
+paracou6 %>% 
+  # Vecteur des noms d'espèce de chaque arbre
+  pull(spName) %>% 
+  # Création d'un objet "abundances"
+  as_abundances() %>% 
+  # Ajout des données de BCI
+  bind_rows(BCI_50ha) %>% 
+  # Remplacement des NA par 0
+  mutate(across(everything(), ~ replace_na(.x, 0))) %>% 
+  # Nom des sites
+  mutate(site = c("Paracou", "BCI")) %>% 
+  # Profil de diversité avec enveloppe de confiance
+  profile_hill(n_simulations = 10) %>% 
+  # Figure
+  autoplot() +
+  # Titre de la légende
+  labs(color = "Forêt", linetype = "Forêt")
+```
+
+## Références pour l'introduction et la discussion
+
+La question de la diversité des forêts tropicales fascine les écologues parce qu'elle a des enjeux très importants [@Gibson2011].
+est qu'elle est difficile à comprendre [@Wright2002b].
+
+Des modèles ont été publiés [@Liang2022].
+
+A l'heure des menaces sur la biodiversité [@Fadrique2026], une connaissance plus détaillée de la diversité des forêts très étudiées est utile.
+
+@MacArthur1967 montrent mathématiquement que la richesse spécifique (le nombre d'espèces) d'une île est un équilibre dynamique entre le taux d'immigration et le taux d'extinction, ce dernier étant directement dicté par la taille de l'île.
+
+BCI est une forêt secondarisée [@Raby2017].
+Sa diversité pourrait être augmentée selon la théorie de la perturbation intermédiaire [@Connell1978].
