@@ -4,5 +4,7 @@
 .Ruserdata
 
 *.html
+*.log
+*.tex
 *.pdf
 *_files/
