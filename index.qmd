@@ -135,7 +135,7 @@ Correction : - [@Gibson2011] dit que sous les tropiques ce qui est important c'e
 # Matériels et méthodes
 
 C'est quoi un nombre un hill ?
-[@Hill1973]
+[@hill1973]
 
 - Présentation du site de Paracou.
 
@@ -169,8 +169,10 @@ BCI %>%
 
 Création d'un tableau d'abondances avec une ligne par site.
 
+::: {#fig-Profils}
 ```{r}
 #| label: Profil
+ggtheme_set()
 paracou6 %>% 
   # Vecteur des noms d'espèce de chaque arbre
   pull(spName) %>% 
@@ -187,8 +189,14 @@ paracou6 %>%
   # Figure
   autoplot() +
   # Titre de la légende
-  labs(color = "Forêt", linetype = "Forêt")
+  labs(color = "Forêt", linetype = "Forêt") + 
+  #Suppression du cartouche 
+  theme(legend.position = "none")
 ```
+
+Profils de la diversité de Paracou parcelle 6 courbe bleue et BCI courbe rouge.
+La figure représente le nombre d'effectif d'espèce (nombre de Hill) en fonction de l'ordre de la diversité
+:::
 
 # Discussion
 
